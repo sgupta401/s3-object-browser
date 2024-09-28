@@ -50,6 +50,7 @@ public class RsaKeyService {
     // The same method as before to fetch the public key from the JWK endpoint
     public RSAKey getPublicKeyFromJwk() throws Exception {
         // Fetch the JWKS JSON from the remote endpoint
+        System.out.println("OIDC Server" + oidcServer);
         String jwksUrl = oidcServer + "/oauth2/jwks";
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(jwksUrl, String.class);
