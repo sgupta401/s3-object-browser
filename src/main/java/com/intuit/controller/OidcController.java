@@ -9,6 +9,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,11 @@ public class OidcController {
     private final CacheManager cacheManager;
     private final RsaKeyService rsaKeyService;
 
+    @Value("${oidc.authorization.server.host}")
+    private String oidcServer;
+
+    @Value("${s3metadata.host}")
+    private String s3Server;
 
     public OidcController(HttpSession httpSession, CacheManager cacheManager, RsaKeyService rsaKeyService) {
         this.httpSession = httpSession;
@@ -42,8 +48,8 @@ public class OidcController {
 
     @GetMapping(value="/callback")
     public RedirectView handleCallback(@RequestParam String code, @RequestParam String state) {
-        String tokenEndpoint = "http://localhost:9000/oauth2/token";
-        String redirectUri = "http://localhost:8080/callback";
+        String tokenEndpoint = oidcServer + "/oauth2/token";
+        String redirectUri = s3Server + "/callback";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -77,7 +83,7 @@ public class OidcController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new RedirectView("http://localhost:8080/error");
+            return new RedirectView(s3Server + "/error");
         }
 
         String sub = getSubjectFromIdToken(idToken);
@@ -89,7 +95,7 @@ public class OidcController {
         return new RedirectView(stateMap.get("ru"));
     }
     private String getUserInfo(String accessToken) {
-        String userInfoEndpoint = "http://localhost:9000/oauth2/userinfo";
+        String userInfoEndpoint = oidcServer + "/oauth2/userinfo";
         
         RestTemplate restTemplate = new RestTemplate();
         String userInfoResponse = restTemplate.getForObject(userInfoEndpoint + "?access_token=" + accessToken, String.class);
@@ -123,7 +129,7 @@ public class OidcController {
         JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
 
         // Verify issuer
-        if (!"http://localhost:9000".equals(claims.getIssuer())) {
+        if (!oidcServer.equals(claims.getIssuer())) {
             return false;
         }
 

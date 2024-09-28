@@ -25,8 +25,8 @@ public class S3Config {
     @Value("${aws.region}")
     private String region;
 
-        @Value("${aws.s3.bucket}")
-        private String bucketName;
+    @Value("${aws.s3.bucket}")
+    private String bucketName;
 
     @Bean
     public S3Client s3client() {

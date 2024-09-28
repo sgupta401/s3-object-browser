@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,6 +22,8 @@ public class RsaKeyService {
 
     private final ObjectMapper objectMapper;
     private RSAKey publicKey;  // Store the generated PublicKey
+    @Value("${oidc.authorization.server.host}")
+    private String oidcServer;
 
     public RsaKeyService(ObjectMapper objectMapper) {
 
@@ -47,7 +50,7 @@ public class RsaKeyService {
     // The same method as before to fetch the public key from the JWK endpoint
     public RSAKey getPublicKeyFromJwk() throws Exception {
         // Fetch the JWKS JSON from the remote endpoint
-        String jwksUrl = "http://localhost:9000/oauth2/jwks";
+        String jwksUrl = oidcServer + "/oauth2/jwks";
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(jwksUrl, String.class);
 

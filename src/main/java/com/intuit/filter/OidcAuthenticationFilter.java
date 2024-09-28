@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
@@ -29,6 +30,12 @@ public class OidcAuthenticationFilter implements Filter {
     }
     @Autowired
     CacheManager cacheManager;
+
+    @Value("${oidc.authorization.server.host}")
+    private String oidcServer;
+
+    @Value("${s3metadata.host}")
+    private String s3Server;
 
     @Override
     public void doFilter(ServletRequest request, jakarta.servlet.ServletResponse response, FilterChain chain)
@@ -66,10 +73,10 @@ public class OidcAuthenticationFilter implements Filter {
         Cache cache = cacheManager.getCache("usercache");
         cache.put(state, stateMap);
         String clientId = "intuit-s3-object-browser";
-        String redirectUri = "http://localhost:8080/callback";
+        String redirectUri = s3Server + "/callback";
 
         String scope = "openid profile";
-        String authorizationEndpoint = "http://localhost:9000/oauth2/authorize";
+        String authorizationEndpoint = oidcServer + "/oauth2/authorize";
 
         // Construct the URL for redirecting to the authorization server
         return authorizationEndpoint + "?" +
