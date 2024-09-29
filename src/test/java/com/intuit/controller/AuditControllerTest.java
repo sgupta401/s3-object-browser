@@ -3,6 +3,7 @@ package com.intuit.controller;
 import com.intuit.dal.AuditRepository;
 import com.intuit.entity.Audit;
 import com.intuit.entity.AuditData;
+import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -41,6 +42,10 @@ class AuditControllerTest {
 
     @InjectMocks
     private AuditController auditController;
+
+
+    @Mock
+    private HttpSession httpSession;
 
     @BeforeEach
     void setUp() {

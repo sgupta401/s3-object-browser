@@ -45,7 +45,8 @@ public class OidcAuthenticationFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         // If the request is for the OIDC callback endpoint, skip security checks
         String path = httpRequest.getRequestURI();
-        if (path.equals("/callback")) {
+        if (path!=null && (path.equalsIgnoreCase("/callback") ||
+                path.equalsIgnoreCase("/health"))) {
             chain.doFilter(request, response);
             return;
         }
