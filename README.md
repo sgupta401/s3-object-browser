@@ -41,10 +41,10 @@ The metadata retrieved from AWS S3 is then returned to the user, completing the 
 
 ## Sequence Diagrams (Low Level Design)
 
-### Resource Server Startup 
+### s3-object-browser (Resource Server) App Startup Sequence
 ![s3-object-browser (Resource Server) App Startup ](https://github.com/user-attachments/assets/a9f5f0e6-5902-4661-8a01-0477b6cd6676)
 
-## s3-object-browser (Resource Server) App Startup Sequence
+
 
 #### 1. RsaKeyService Initialization
 - **Action**: The `s3-object-browser` application starts up.
@@ -70,9 +70,9 @@ The metadata retrieved from AWS S3 is then returned to the user, completing the 
   - This key is then configured within the service to validate the signatures of JWTs provided by the OIDC Server in subsequent authentications.
 
 
-### Authentication process and /object_metadata/filename endpoint 
+### Sequence Diagram: User Access to Protected Resources (Authentication process and /object_metadata/filename endpoint)
 ![User Access Protected Resources (like _object_metadata_file1 txt)](https://github.com/user-attachments/assets/2c63e1da-6a03-42dd-8ba1-7747a25e4ad1)
-## Sequence Diagram: User Access to Protected Resources
+
 
 ### Steps:
 
@@ -125,14 +125,10 @@ The metadata retrieved from AWS S3 is then returned to the user, completing the 
 #### 11. Return Metadata
 - **ObjectMetadataController**: Returns the object metadata to the User Browser as a JSON response.
 
-### Conclusion
-This sequence successfully details how a user is authenticated using OIDC and then accesses a protected resource within an application, showing the integration of session management, token handling, and interaction with external systems (OIDC Server and AWS).
-
 
 ### Audit 
-![Audit Log Save ](https://github.com/user-attachments/assets/308cd3af-2998-48fe-ac69-8355262e169d)
-
 #### Sequence Diagram: Audit Log Save
+![Audit Log Save ](https://github.com/user-attachments/assets/308cd3af-2998-48fe-ac69-8355262e169d)
 
 #### Steps:
 
@@ -178,7 +174,37 @@ This sequence successfully details how a user is authenticated using OIDC and th
 
 The Aspect-Oriented Programming approach allows for clean separation of concerns, where the logging logic is decoupled from the business logic, enhancing maintainability and scalability of the application.
 
+#### Sequence Diagram: Audit Log endpoint `/audit_log`
+
 ![Audit Log endpoint _audit_log](https://github.com/user-attachments/assets/037e888d-de8a-4a57-92ff-3f10e9fea955)
+
+
+#### Steps:
+
+#### 1. User Initiates Request
+- **Logged In User**:
+  - Makes an HTTP request to the `/audit_log` endpoint. This action typically occurs from a web browser or other client interface where the user is already authenticated.
+
+#### 2. Controller Handles Request
+- **AuditController**:
+  - Receives the request to fetch audit logs.
+  - This controller is responsible for handling web requests related to audit logs.
+
+#### 3. Retrieve Audit Logs
+- **AuditRepository (H2 DB)**:
+  - The `AuditController` invokes the `findAll()` method on the `AuditRepository`.
+  - This repository layer interacts with the H2 database to retrieve all audit log entries stored in the database.
+
+#### 4. Return Audit Logs
+- **AuditRepository (H2 DB)**:
+  - Returns a list of all audit logs to the `AuditController`.
+  - The data returned is typically a collection of audit entries that record user activities or system events.
+
+#### 5. Send Response to User
+- **AuditController**:
+  - Receives the list of audit logs and packages them into a JSON format.
+  - Sends the audit logs JSON response back to the logged-in user.
+
 
 ### Health Check 
 ![Health Check (_health)](https://github.com/user-attachments/assets/0bc8fecc-99fa-47a8-b593-6bfe5569fdac)
