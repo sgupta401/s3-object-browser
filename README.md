@@ -206,7 +206,45 @@ The Aspect-Oriented Programming approach allows for clean separation of concerns
   - Sends the audit logs JSON response back to the logged-in user.
 
 
-### Health Check 
+#### Sequence Diagram: Health Check (`/health`)
 ![Health Check (_health)](https://github.com/user-attachments/assets/0bc8fecc-99fa-47a8-b593-6bfe5569fdac)
+
+
+
+#### Steps:
+
+#### 1. User Requests Health Information
+- **Logged In User**:
+  - Initiates an HTTP request to the `/health` endpoint. This is usually done via a web browser or through an API client as part of monitoring or diagnostic processes.
+
+#### 2. Actuator Handles Request
+- **HealthEndpointWebExtension (Actuator Framework)**:
+  - Receives the health check request. This component is part of the Spring Boot Actuator and extends the basic health endpoint functionality to support web-specific features, like security and response formatting.
+
+#### 3. Check Database Health
+- **DataSourceHealthIndicator (Actuator Framework)**:
+  - Checks the health of the database by executing a dummy SQL query.
+  - Returns the database status, which could be `UP` if the query executes successfully or `DOWN` if it fails.
+
+#### 4. Check Disk Space
+- **DiskSpaceHealthIndicator (Actuator Framework)**:
+  - Evaluates the health of the disk by checking available disk space.
+  - Returns the disk health status, indicating `UP` if there is sufficient disk space or `DOWN` if the available space falls below a configured threshold.
+
+#### 5. Check AWS Connection
+- **S3HealthIndicator (Custom Class)**:
+  - Checks the health of the connection to AWS services, focusing on S3 as an example.
+  - This custom class might perform operations like connecting to an S3 bucket and retrieving a small object or simply checking the connectivity.
+  - Returns the AWS health status, which is `UP` if the connection is successful and stable, or `DOWN` if the connection to AWS S3 fails.
+
+#### 6. Consolidate Health Information
+- **HealthEndpointWebExtension (Actuator Framework)**:
+  - Collects and consolidates the health statuses from all checked components into a single comprehensive health response.
+  - Formats this response typically in JSON, providing the overall health status and individual statuses of each component.
+
+#### 7. Response Sent to User
+- **Logged In User**:
+  - Receives the consolidated health response, which helps in determining the operational status of different system components.
+
 
 
