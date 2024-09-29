@@ -132,6 +132,52 @@ This sequence successfully details how a user is authenticated using OIDC and th
 ### Audit 
 ![Audit Log Save ](https://github.com/user-attachments/assets/308cd3af-2998-48fe-ac69-8355262e169d)
 
+#### Sequence Diagram: Audit Log Save
+
+#### Steps:
+
+#### 1. Initial Request
+- **Logged In User**: Initiates an HTTP request to access object metadata.
+  - **URL**: `/object_metadata/file1`
+
+#### 2. Request Handling by Spring Framework
+- **Spring Framework (Dispatcher Servlet / RequestMappingHandlerAdapter)**:
+  - Receives the HTTP request.
+  - Responsible for routing the request to the appropriate controller.
+
+#### 3. AOP Interception
+- **RestEndpointAuditAspect**:
+  - Intercepts the call with an Around advice before it reaches the `ObjectMetadataController`.
+  - This aspect is used for audit logging.
+
+#### 4. Controller Processing
+- **ObjectMetadataController**:
+  - Processes the request to fetch metadata from an S3 object.
+  - Calls the AWS service to get the metadata for `file1.txt`.
+
+#### 5. AWS Interaction
+- **AWS**:
+  - Returns the requested S3 object metadata to the `ObjectMetadataController`.
+
+#### 6. Audit Logging
+- **RestEndpointAuditAspect**:
+  - After receiving the S3 object metadata, the audit aspect logs the transaction details.
+  - This includes data such as user, accessed object, and timestamp.
+  - The audit data is prepared for storage.
+
+#### 7. Data Persistence
+- **H2 Database**:
+  - Audit data is saved to the H2 database for long-term storage and future audits.
+
+#### 8. Return Response
+- **ObjectMetadataController**:
+  - Sends the S3 object metadata back to the user as a JSON response.
+- **Spring Framework (Dispatcher Servlet / RequestMappingHandlerAdapter)**:
+  - Completes the response handling by sending the JSON metadata back to the user.
+
+
+The Aspect-Oriented Programming approach allows for clean separation of concerns, where the logging logic is decoupled from the business logic, enhancing maintainability and scalability of the application.
+
 ![Audit Log endpoint _audit_log](https://github.com/user-attachments/assets/037e888d-de8a-4a57-92ff-3f10e9fea955)
 
 ### Health Check 
