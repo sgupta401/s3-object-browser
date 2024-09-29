@@ -83,7 +83,7 @@ public class OidcController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new RedirectView(s3Server + "/error");
+            return new RedirectView( "http://localhost:8080/error");
         }
 
         String sub = getSubjectFromIdToken(idToken);

@@ -73,10 +73,10 @@ public class OidcAuthenticationFilter implements Filter {
         Cache cache = cacheManager.getCache("usercache");
         cache.put(state, stateMap);
         String clientId = "intuit-s3-object-browser";
-        String redirectUri = s3Server + "/callback";
+        String redirectUri = "http://localhost:8080" + "/callback";
 
         String scope = "openid profile";
-        String authorizationEndpoint = oidcServer + "/oauth2/authorize";
+        String authorizationEndpoint = "http://localhost:9000" + "/oauth2/authorize";
 
         // Construct the URL for redirecting to the authorization server
         return authorizationEndpoint + "?" +
