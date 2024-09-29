@@ -5,14 +5,16 @@ import com.intuit.entity.Audit;
 import com.intuit.entity.S3Metadata;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpSession;
-import org.aspectj.lang.JoinPoint;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
+import org.slf4j.Logger;
+
 
 @Aspect
 @Component
@@ -21,6 +23,7 @@ public class RestEndpointAuditAspect {
   @Autowired AuditRepository auditRepository;
 
   @Autowired private HttpSession httpSession;
+  Logger logger = LoggerFactory.getLogger(RestEndpointAuditAspect.class);
 
 //  @Pointcut("within(com.intuit.controller.ProtectedResourceController)")
 //  public void restControllerMethods() {}
@@ -33,7 +36,7 @@ public class RestEndpointAuditAspect {
       result = joinPoint.proceed();
     } catch (Throwable ex) {
       // This block will not run if the exception is caught within the method
-      System.out.println("Exception caught in Aspect: " + ex.getMessage());
+      logger.error("Exception caught in Aspect: " + ex.getMessage());
       throw ex; // Optionally rethrow
     } finally {
       // This block will always execute, regardless of method outcome
@@ -43,7 +46,7 @@ public class RestEndpointAuditAspect {
         String accessTime = Instant.now().toString();
         String fileName = (String) joinPoint.getArgs()[0];
         Audit audit = new Audit(fileName, user, accessTime);
-        System.out.println(
+        logger.info(
             "Audit Log: Object: "
                 + fileName
                 + " accessed by : "

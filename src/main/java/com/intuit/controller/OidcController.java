@@ -82,7 +82,6 @@ public class OidcController {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
             return new RedirectView( "http://localhost:8080/error");
         }
 
@@ -109,7 +108,6 @@ public class OidcController {
             JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
             return claims.getSubject();
         } catch (ParseException e) {
-            e.printStackTrace();
             return null;
         }
     }

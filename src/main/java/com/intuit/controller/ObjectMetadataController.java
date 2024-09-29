@@ -1,9 +1,6 @@
 package com.intuit.controller;
 
-import com.intuit.dal.AuditRepository;
 import com.intuit.entity.S3Metadata;
-import jakarta.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -19,11 +16,6 @@ public class ObjectMetadataController {
 
   @Autowired S3Client s3Client;
 
-  @Autowired private AuditRepository auditRepository;
-
-  @Autowired
-  private HttpSession httpSession;
-
   @Value("${aws.s3.bucket}")
   private String bucketName;
 
@@ -33,7 +25,7 @@ public class ObjectMetadataController {
     S3Metadata s3Metadata = null;
     // Define the bucket name and object key
 
-    String objectKey = fileName; // Example: "folder/object-name.txt"
+    String objectKey = fileName;
 
     // Create a HeadObjectRequest to get object metadata
     HeadObjectRequest headObjectRequest =
@@ -53,7 +45,6 @@ public class ObjectMetadataController {
         s3Metadata.setVersionId(headObjectResponse.versionId());
       }
     } catch (Exception e) {
-      e.printStackTrace();
       s3Metadata = new S3Metadata();
       s3Metadata.setError(e.toString());
     }

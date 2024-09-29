@@ -8,17 +8,22 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 
 
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 
 @Service
+
 public class RsaKeyService {
 
     private static final Logger logger = LoggerFactory.getLogger(RsaKeyService.class);
@@ -27,21 +32,25 @@ public class RsaKeyService {
     private RSAKey publicKey;  // Store the generated PublicKey
     @Value("${oidc.authorization.server.host}")
     private String oidcServer;
-
-    public RsaKeyService(ObjectMapper objectMapper) {
+    private final Environment environment;
+    public RsaKeyService(ObjectMapper objectMapper,  Environment environment) {
 
         this.objectMapper = objectMapper;
+        this.environment = environment;
     }
 
     // This method will be called after the RsaKeyService bean is created, during startup
     @PostConstruct
     public void init() {
+        // Skip initialization if in the test profile
+        if (Arrays.asList(environment.getActiveProfiles()).contains("test")) {
+            return;
+        }
         try {
             // Generate the RSA public key from the JWK
             this.publicKey = getPublicKeyFromJwk();
-            System.out.println("RSA Public Key generated on startup: " + this.publicKey);
+            logger.info("RSA Public Key generated on startup: " + this.publicKey);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("Failed to initialize RSA public key", e);
         }
     }
