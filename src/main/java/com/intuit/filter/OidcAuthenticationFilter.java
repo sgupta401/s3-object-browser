@@ -53,6 +53,15 @@ public class OidcAuthenticationFilter implements Filter {
 
         HttpSession session = httpRequest.getSession(false); // Do not create a session if it doesn't exist
 
+        if (path!=null && (path.equalsIgnoreCase("/logout"))) {
+            //Remove the user attribute from session, which effectively
+            // logs out user from current application
+            session.removeAttribute("user");
+             ((HttpServletRequest) request).logout();
+             // Call OIDC server logout
+            httpResponse.sendRedirect("http://localhost:9000/logout");
+            return;
+        }
         // Check if the user is authenticated
         if (session == null || session.getAttribute("user") == null) {
             // User is not authenticated, redirect to the OIDC authorization endpoint
