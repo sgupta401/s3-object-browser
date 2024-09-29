@@ -7,7 +7,8 @@ import java.time.Instant;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
 public class S3Metadata {
-
+    private String objectName;
+    private String loggedInUser;
     private String versionId;
     private String storageClass;
     private String serverSideEncryption;
@@ -61,5 +62,21 @@ public class S3Metadata {
 
     public void setLastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    public void setLoggedInUser(String loggedInUser) {
+        this.loggedInUser = loggedInUser;
+    }
+
+    public String getObjectName() {
+        return objectName;
+    }
+
+    public void setObjectName(String objectName) {
+        this.objectName = objectName;
     }
 }

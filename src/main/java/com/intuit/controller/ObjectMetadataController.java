@@ -1,6 +1,7 @@
 package com.intuit.controller;
 
 import com.intuit.entity.S3Metadata;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -15,6 +16,9 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 public class ObjectMetadataController {
 
   @Autowired S3Client s3Client;
+
+  @Autowired
+  HttpSession httpSession;
 
   @Value("${aws.s3.bucket}")
   private String bucketName;
@@ -37,12 +41,13 @@ public class ObjectMetadataController {
 
       if (headObjectResponse != null) {
         s3Metadata = new S3Metadata();
-
+        s3Metadata.setObjectName(fileName);
         s3Metadata.setLastModifiedDate(headObjectResponse.lastModified());
         s3Metadata.setPartsCount(headObjectResponse.partsCount());
         s3Metadata.setStorageClass(headObjectResponse.storageClassAsString());
         s3Metadata.setServerSideEncryption(headObjectResponse.serverSideEncryptionAsString());
         s3Metadata.setVersionId(headObjectResponse.versionId());
+        s3Metadata.setLoggedInUser((String)httpSession.getAttribute("user"));
       }
     } catch (Exception e) {
       s3Metadata = new S3Metadata();
