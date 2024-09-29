@@ -49,7 +49,7 @@ public class OidcController {
     @GetMapping(value="/callback")
     public RedirectView handleCallback(@RequestParam String code, @RequestParam String state) {
         String tokenEndpoint = oidcServer + "/oauth2/token";
-        String redirectUri = s3Server + "/callback";
+        String redirectUri =  "http://localhost:8080/callback";
 
         RestTemplate restTemplate = new RestTemplate();
 
