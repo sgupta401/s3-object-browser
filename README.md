@@ -38,6 +38,20 @@ Actions such as the user's access and activities are logged into an H2 database 
 
 The metadata retrieved from AWS S3 is then returned to the user, completing the interaction flow.
 
+## Data base design for Audits
+H2 database is used for storing audits.H2 is primarily used as in-memory database, but its configuration is modified to make database persistent. The data is stored in the './data' folder locally on disk. 
+Database contains following table/s
+1. Table name: AUDIT
+   Columns
+     1. ID: Primary Key
+     2. ACCESS_BY: User who access the metadata of the s3 object
+     3. ACCESS_TIME: Time at which the metadata was accessed
+     4. FILE_NAME: Accessed object name
+
+H2 Db console is avaiable locally on `http://localhost:8080/h2-console/`
+
+## Cache
+In memory concurrent hashmap is used for storing user's state data, for example, the original request resource, before the user is redirected to OIDC server. The key for this cache is the random `state` string and the value is a map with key as parameter names, for e.g. when the user accesses `/object_metadata/file1.txt` and is not logged in, then before getting redireced to OIDC server, a random state string is generated - which becomes the cache key. The value of the cache is a hashmap with key being parameter name, (in this case ru - requested url) and value is `/object_metadata/file1.txt`
 
 ## Sequence Diagrams (Low Level Design)
 
